@@ -1,0 +1,9 @@
+.env
+.env.*
+!.env.example
+virt/
+.venv/
+__pycache__/
+*.py[cod]
+.DS_Store
+*.sqlite3
