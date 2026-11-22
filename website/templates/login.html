@@ -4,17 +4,12 @@
 
 <div class='col-md-6 offset-md-3'>
 
-{% if user.is_authenticated %}
-
-<h1>Hello there</h1>
-
-{% else %}
-
 <h1>Login</h1>
 <br/>
 
 <form method='POST' action="{% url 'login' %}">
     {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next|default_if_none:'' }}">
     <div class="mb-3">
         <input type="text" class="form-control" name="username" placeholder="Username" required>
     </div>
@@ -24,8 +19,6 @@
     <br/>
     <button type="submit" class="btn btn-secondary">Login</button>
 </form>
-
-{% endif %}
 
 </div>
 

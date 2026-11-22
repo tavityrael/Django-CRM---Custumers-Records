@@ -16,18 +16,20 @@
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
 
         {% if user.is_authenticated %}
+{% if perms.website.add_costumer %}
         <li class="nav-item">
           <a class="nav-link" href="{% url 'add_record' %}">Add Record</a>
         </li>
+{% endif %}
         
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn nav-link">Logout</button>
+          </form>
         </li>
 
         {% else %}
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'register' %}">Register</a>
-        </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url 'login' %}">Login</a>
         </li>

@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os
 
+from django.core.exceptions import ImproperlyConfigured
+
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -22,13 +24,26 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-_bq3ja8etfc!$v0(q2bdi!9n9+r%##g29s7&yf-00us(mw=8+1'
+def required_env(name):
+    value = os.environ.get(name)
+    if not value or not value.strip():
+        raise ImproperlyConfigured(f"{name} must be set.")
+    return value
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = []
+SECRET_KEY = required_env("SECRET_KEY")
+
+debug_setting = os.environ.get("DEBUG", "false").strip().lower()
+if debug_setting not in {"true", "false"}:
+    raise ImproperlyConfigured("DEBUG must be true or false.")
+DEBUG = debug_setting == "true"
+ALLOWED_HOSTS = [
+    host.strip() for host in os.environ.get("ALLOWED_HOSTS", "").split(",") if host.strip()
+]
+if not DEBUG and (not ALLOWED_HOSTS or "*" in ALLOWED_HOSTS):
+    raise ImproperlyConfigured("Set ALLOWED_HOSTS to the deployment's hostnames.")
+
+LOGIN_URL = "login"
 
 
 # Application definition
@@ -78,14 +93,14 @@ WSGI_APPLICATION = 'cst_rec.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'sct_rec', 
-        'USER': 'postgres',
-        'PASSWORD': 'David85',
-        'HOST': '127.0.0.1', 
-        'PORT': '5432',
-    }
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": required_env("DB_NAME"),
+        "USER": required_env("DB_USER"),
+        "PASSWORD": required_env("DB_PASSWORD"),
+        "HOST": required_env("DB_HOST"),
+        "PORT": os.environ.get("DB_PORT", "5432"),
+    },
 }
 
 

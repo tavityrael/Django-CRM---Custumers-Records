@@ -24,8 +24,15 @@
   <br/><br/>
   <a href="{% url 'home' %}" class="btn btn-secondary">Back</a>
 
-  <a href="{% url 'delete_costumer' costumer_record.id %}" class="btn btn-danger">Delete</a>
+  {% if perms.website.delete_costumer %}
+    <form method="post" action="{% url 'delete_costumer' costumer_record.id %}" class="d-inline">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+  {% endif %}
 
-  <a href="{% url 'update_costumer' costumer_record.id %}" class="btn btn-secondary">Update Recordr</a>
+  {% if perms.website.change_costumer %}
+    <a href="{% url 'update_costumer' costumer_record.id %}" class="btn btn-secondary">Update record</a>
+  {% endif %}
 
 {% endblock %}
